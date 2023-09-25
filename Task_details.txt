@@ -1,0 +1,91 @@
+import java.awt.EventQueue;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import net.proteanit.sql.DbUtils;
+
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import java.awt.Color;
+
+public class Taskdetails extends JFrame {
+
+	private JPanel contentPane;
+	private JTable table;
+	Connection con;
+	Statement stm;
+	private JScrollPane scrollPane_1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Taskdetails frame = new Taskdetails();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public Taskdetails() throws Exception {
+
+		Taskdetails1();
+		sql1();
+		tableget();
+
+	}
+
+//Connection con;
+	public void sql1() throws Exception {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-4CLCMNC:1433;DATABASENAME=jdbc", "sa",
+				"shivsp9987");
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public void Taskdetails1() {
+		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1012, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(27, 29, 959, 232);
+		contentPane.add(scrollPane_1);
+
+		table = new JTable();
+		table.setCellSelectionEnabled(true);
+		table.setRowSelectionAllowed(false);
+		table.setSurrendersFocusOnKeystroke(true);
+		scrollPane_1.setViewportView(table);
+		table.setBackground(new Color(242, 243, 203));
+	}
+
+	public void tableget() throws SQLException {
+		String qry = "  select User_name ,roles,task,task_assign,task_close, CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/(60*60*1000)%24 AS varchar(50)) +' Hr '+ "
+				+ " CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/(60*1000)%60 AS varchar(50))   + ' Mins '+ "
+				+ " CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/1000 %60 AS varchar(50))       + ' Secs ' AS Duration "
+				+ "  FROM AccessPrivilage";
+		stm = con.createStatement();
+		ResultSet rst = stm.executeQuery(qry);
+		table.setModel(DbUtils.resultSetToTableModel(rst));
+
+	}
+}

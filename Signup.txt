@@ -1,0 +1,318 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import com.toedter.calendar.JDateChooser;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+
+import java.awt.AWTException;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Window;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.ImageIcon;
+
+public class SignupRegister extends JFrame {
+
+	protected static final Window frmTrackingSystem = null;
+	private JPanel contentPane;
+	private JTextField txt_name;
+	private JTextField text_user;
+	private JTextField txt_password;
+	private JTextField txt_confirmpass;
+	private JButton btnNewButton;
+	private JButton btnNewButton_1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					SignupRegister frame = new SignupRegister();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public SignupRegister() throws ClassNotFoundException, SQLException {
+		intial();
+		sql1();
+	}
+
+	Connection con;
+	private JLabel emt_msg_namelabel;
+	private JLabel emt_msg_dob;
+	private JLabel emt_msg_passw;
+	private JLabel emt_msg_confirmpass;
+	private JLabel note_user_name_msg;
+	private JLabel lblNewLabel_2;
+
+	public void sql1() throws ClassNotFoundException, SQLException {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-4CLCMNC:1433;DATABASENAME=jdbc", "sa",
+				"shivsp9987");
+	}
+
+	public void intial() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1050, 600);
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JCheckBox checkbox = new JCheckBox("Terms and conditon applied");
+		checkbox.setBounds(460, 385, 201, 20);
+		contentPane.add(checkbox);
+
+		JLabel lblNewLabel = new JLabel("Name :");
+		lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		lblNewLabel.setBounds(303, 106, 131, 20);
+		contentPane.add(lblNewLabel);
+
+		note_user_name_msg = new JLabel("Please Enter user name");
+		note_user_name_msg.setForeground(new Color(0, 0, 0));
+		note_user_name_msg.setBounds(461, 242, 177, 14);
+		contentPane.add(note_user_name_msg);
+		note_user_name_msg.setVisible(false);
+
+		txt_name = new JTextField();
+		txt_name.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char k = e.getKeyChar();
+				if (Character.isDigit(k)) {
+					e.consume();
+				}
+			}
+		});
+		txt_name.setBounds(460, 107, 201, 20);
+		contentPane.add(txt_name);
+		txt_name.setColumns(10);
+
+		JLabel lblNewLabel_1 = new JLabel("CREATE USER ");
+		lblNewLabel_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 20));
+		lblNewLabel_1.setBounds(382, 11, 269, 46);
+		contentPane.add(lblNewLabel_1);
+
+		JLabel lblDateOfBirth = new JLabel("Date Of Birth :");
+		lblDateOfBirth.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		lblDateOfBirth.setBounds(303, 154, 131, 20);
+		contentPane.add(lblDateOfBirth);
+
+		JLabel lblUserName = new JLabel("User Name :");
+		lblUserName.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		lblUserName.setBounds(303, 221, 128, 20);
+		contentPane.add(lblUserName);
+
+		JDateChooser text_date = new JDateChooser();
+		text_date.setDateFormatString("dd-MM-yyyy");
+		text_date.setBounds(460, 154, 201, 20);
+		contentPane.add(text_date);
+
+		text_user = new JTextField();
+
+		text_user.setColumns(10);
+		text_user.setBounds(460, 222, 201, 20);
+		contentPane.add(text_user);
+
+		JLabel lblPassword = new JLabel("Password :");
+		lblPassword.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		lblPassword.setBounds(303, 275, 131, 20);
+		contentPane.add(lblPassword);
+
+		emt_msg_namelabel = new JLabel("Enter a Name");
+		emt_msg_namelabel.setBounds(460, 126, 201, 14);
+		contentPane.add(emt_msg_namelabel);
+		emt_msg_namelabel.setVisible(false);
+
+		emt_msg_dob = new JLabel("select Date of Brith");
+		emt_msg_dob.setBounds(460, 174, 201, 14);
+		contentPane.add(emt_msg_dob);
+		emt_msg_dob.setVisible(false);
+
+		emt_msg_passw = new JLabel("Please Enter your Password");
+		emt_msg_passw.setBounds(460, 296, 201, 14);
+		contentPane.add(emt_msg_passw);
+		emt_msg_passw.setVisible(false);
+
+		emt_msg_confirmpass = new JLabel("Enter your confirm password");
+		emt_msg_confirmpass.setBounds(460, 363, 201, 14);
+		contentPane.add(emt_msg_confirmpass);
+		emt_msg_confirmpass.setVisible(false);
+
+		JLabel mismacth_pass = new JLabel("Password does not match");
+		mismacth_pass.setBounds(460, 324, 158, 14);
+		contentPane.add(mismacth_pass);
+		mismacth_pass.setVisible(false);
+
+		txt_password = new JTextField();
+		txt_password.setColumns(10);
+		txt_password.setBounds(460, 276, 201, 20);
+		contentPane.add(txt_password);
+
+		JLabel lblConfirmPassword = new JLabel("Confirm Password :");
+		lblConfirmPassword.setFont(new Font("Times New Roman", Font.BOLD, 15));
+		lblConfirmPassword.setBounds(303, 341, 131, 20);
+		contentPane.add(lblConfirmPassword);
+
+		txt_confirmpass = new JTextField();
+		txt_confirmpass.setColumns(10);
+		txt_confirmpass.setBounds(460, 342, 201, 20);
+		contentPane.add(txt_confirmpass);
+
+		btnNewButton = new JButton("Submit");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					String s2 = null;
+					String name_box = txt_name.getText();
+					String date_chose = null;
+					String user_box = text_user.getText();
+					String pass_box = txt_password.getText();
+					// Pattern p1=Pattern.compile("([A-Z]{2})+([a-z]{1})+([!@#$%^&*]{1})+([9-0])+");
+					// Matcher m1=p1.matcher(pass_box);
+					// boolean b1=m1.matches();
+					// System.out.println(b1);
+					String confirmpass = txt_confirmpass.getText();
+
+					if (name_box.isEmpty()) {
+						emt_msg_namelabel.setVisible(true);
+						emt_msg_dob.setVisible(false);
+//				emt_msg_confirmpass.setVisible(false);
+//				emt_msg_passw.setVisible(false);
+//			
+//				emt_msg_namelabel.setVisible(false);
+						txt_name.requestFocus();
+					}
+					Date d1 = text_date.getDate();
+					if (d1 == null && !name_box.isEmpty()) {
+						emt_msg_dob.setVisible(true);
+						emt_msg_namelabel.setVisible(false);
+						mismacth_pass.setVisible(false);
+					} else if (user_box.isEmpty() && d1 != null) {
+
+						note_user_name_msg.setVisible(true);
+						emt_msg_dob.setVisible(false);
+					} else if (pass_box.isEmpty() && !name_box.isEmpty() && d1 != null) {
+						emt_msg_passw.setVisible(true);
+						emt_msg_dob.setVisible(false);
+						emt_msg_namelabel.setVisible(false);
+						mismacth_pass.setVisible(false);
+						note_user_name_msg.setVisible(false);
+					} else if (confirmpass.isEmpty() && !pass_box.isEmpty() && !name_box.isEmpty() && d1 != null) {
+						emt_msg_confirmpass.setVisible(true);
+						emt_msg_passw.setVisible(false);
+						emt_msg_dob.setVisible(false);
+						emt_msg_namelabel.setVisible(false);
+						mismacth_pass.setVisible(false);
+						note_user_name_msg.setVisible(false);
+
+					} else if (!pass_box.equals(confirmpass) && !confirmpass.isEmpty() && !pass_box.isEmpty()) {
+						mismacth_pass.setVisible(true);
+						emt_msg_confirmpass.setVisible(false);
+						note_user_name_msg.setVisible(false);
+					} else if (checkbox.isSelected() == false && pass_box.equals(confirmpass) && !confirmpass.isEmpty()
+							&& !pass_box.isEmpty()) {
+						checkbox.setBackground(new Color(128, 0, 0));
+					}
+
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					if (d1 != null) {
+						s2 = sdf.format(d1);
+						date_chose = s2;
+					}
+					if (!name_box.isEmpty() && !date_chose.isEmpty() && !user_box.isEmpty() && !pass_box.isEmpty()
+							&& !confirmpass.isEmpty() && pass_box.equals(confirmpass) && checkbox.isSelected()) {
+
+						try {
+							String qry = "INSERT INTO REGISTER (NAME,DOB,USER_NAME,PASSWORD,CONFIRMPASSWORD) VALUES(?,?,?,?,?)";
+							PreparedStatement pst = con.prepareStatement(qry);
+							pst.setString(1, name_box);
+							pst.setString(2, date_chose);
+							pst.setString(3, user_box);
+							pst.setString(4, pass_box);
+							pst.setString(5, confirmpass);
+							pst.executeUpdate();
+							JOptionPane.showMessageDialog(lblConfirmPassword, "User Created Successfully");
+							UserLogin l2 = new UserLogin();
+							l2.frmTrackingSystem.setVisible(true);
+							dispose();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							JOptionPane.showMessageDialog(lblConfirmPassword, "invalid username");
+						}
+					}
+				} catch (Exception e6) {
+					System.out.println("event errr");
+				}
+			}
+		});
+		btnNewButton.setBounds(358, 434, 89, 23);
+		contentPane.add(btnNewButton);
+
+		btnNewButton_1 = new JButton("Clear");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txt_name.setText("");
+				text_date.setDate(null);
+				text_user.setText("");
+				txt_password.setText("");
+				txt_confirmpass.setText("");
+				txt_name.requestFocus();
+			}
+		});
+		btnNewButton_1.setBounds(493, 434, 89, 23);
+		contentPane.add(btnNewButton_1);
+
+		JButton btnNewButton_2 = new JButton("Back");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UserLogin l = null;
+				try {
+					l = new UserLogin();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				l.frmTrackingSystem.setVisible(true);
+				dispose();
+			}
+		});
+		btnNewButton_2.setBounds(10, 11, 71, 23);
+		contentPane.add(btnNewButton_2);
+
+		lblNewLabel_2 = new JLabel("");
+		lblNewLabel_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\pharmacy.gif"));
+		lblNewLabel_2.setBounds(21, 106, 272, 299);
+		contentPane.add(lblNewLabel_2);
+	}
+}

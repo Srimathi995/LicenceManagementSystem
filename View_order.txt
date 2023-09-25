@@ -1,0 +1,455 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.awt.ScrollPane;
+
+import javax.swing.JTable;
+import java.awt.Color;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import net.proteanit.sql.DbUtils;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.EventObject;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextField;
+import javax.swing.ImageIcon;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import javax.swing.ListSelectionModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+
+public class Vieworder extends JFrame implements Runnable {
+
+	private JPanel contentPane;
+	DefaultTableModel model;
+	int b;
+	int i;
+	JLabel time1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Vieworder frame = new Vieworder();
+					frame.setVisible(true);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	// database connection
+	public Vieworder() throws ClassNotFoundException, SQLException {
+		intial();
+		sql1();
+		tabledata();
+		Thread d1 = new Thread(this);
+		d1.start();
+	}
+
+	Connection con1;
+	private JTable table;
+	private JTextField Order_id1;
+
+	public void sql1() throws ClassNotFoundException, SQLException {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con1 = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-4CLCMNC:1433;DATABASENAME=jdbc", "sa",
+				"shivsp9987");
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public void intial() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1050, 600);
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+
+		JPanel details_panel = new JPanel();
+		details_panel.setBounds(567, 560, 677, 233);
+		details_panel.setBackground(new Color(255, 255, 255));
+		details_panel.setLayout(null);
+		details_panel.setVisible(false);
+
+		JLabel lblNewLabel_1 = new JLabel("Product Name :");
+		lblNewLabel_1.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1.setBounds(37, 30, 93, 14);
+		details_panel.add(lblNewLabel_1);
+
+		JLabel lblNewLabel_1_1 = new JLabel("Quantity :");
+		lblNewLabel_1_1.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_1.setBounds(334, 30, 93, 14);
+		details_panel.add(lblNewLabel_1_1);
+
+		JLabel lblNewLabel_1_1_1 = new JLabel("Area :");
+		lblNewLabel_1_1_1.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_1_1.setBounds(37, 135, 93, 14);
+		details_panel.add(lblNewLabel_1_1_1);
+
+		JLabel lblNewLabel_1_1_1_1 = new JLabel("Recipe ID :");
+		lblNewLabel_1_1_1_1.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_1_1_1.setBounds(37, 84, 93, 14);
+		details_panel.add(lblNewLabel_1_1_1_1);
+
+		JLabel lblNewLabel_1_1_1_2 = new JLabel("Recipe Name :");
+		lblNewLabel_1_1_1_2.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_1_1_2.setBounds(334, 84, 93, 14);
+		details_panel.add(lblNewLabel_1_1_1_2);
+
+		JLabel lblNewLabel_1_1_1_3 = new JLabel("Room_no :");
+		lblNewLabel_1_1_1_3.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_1_1_3.setBounds(334, 135, 93, 14);
+		details_panel.add(lblNewLabel_1_1_1_3);
+
+		JLabel product_value = new JLabel("");
+		product_value.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		product_value.setBounds(151, 30, 68, 14);
+		details_panel.add(product_value);
+
+		JLabel display_ven_id = new JLabel("");
+		display_ven_id.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_ven_id.setBounds(151, 84, 93, 14);
+		details_panel.add(display_ven_id);
+
+		JLabel display_vendor_add = new JLabel("");
+		display_vendor_add.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_vendor_add.setBounds(151, 135, 93, 14);
+		details_panel.add(display_vendor_add);
+
+		JLabel display_quantity = new JLabel("");
+		display_quantity.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_quantity.setBounds(444, 30, 93, 14);
+		details_panel.add(display_quantity);
+
+		JLabel display_vendor_name = new JLabel("");
+		display_vendor_name.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_vendor_name.setBounds(444, 84, 93, 14);
+		details_panel.add(display_vendor_name);
+
+		JLabel display_contact = new JLabel("");
+		display_contact.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_contact.setBounds(444, 135, 93, 14);
+		details_panel.add(display_contact);
+
+		JLabel lblNewLabel_1_8_1 = new JLabel("Order ID :");
+		lblNewLabel_1_8_1.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		lblNewLabel_1_8_1.setBounds(189, 190, 68, 17);
+		details_panel.add(lblNewLabel_1_8_1);
+
+		JLabel display_order_id = new JLabel("");
+		display_order_id.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		display_order_id.setBounds(267, 191, 47, 14);
+		details_panel.add(display_order_id);
+		Date d1 = new Date();
+		SimpleDateFormat time = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss aa");
+		String s1 = time.format(d1);
+
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(20, 176, 993, 358);
+		scrollPane_1.setEnabled(false);
+
+		JLabel lblNewLabel_4 = new JLabel("Invalid Quantity Number Entered");
+		lblNewLabel_4.setBounds(577, 137, 202, 14);
+		lblNewLabel_4.setForeground(new Color(128, 0, 0));
+		lblNewLabel_4.setVisible(false);
+
+		JLabel lblNewLabel_1_8_2 = new JLabel("Order ID :");
+		lblNewLabel_1_8_2.setBounds(256, 109, 111, 17);
+		lblNewLabel_1_8_2.setFont(new Font("Times New Roman", Font.BOLD, 20));
+
+		Order_id1 = new JTextField();
+		Order_id1.setBounds(357, 106, 185, 20);
+		Order_id1.setEditable(false);
+		Order_id1.setColumns(10);
+
+		JLabel lblNewLabel_5 = new JLabel("Please Select Order Id");
+		lblNewLabel_5.setBounds(367, 137, 164, 14);
+		lblNewLabel_5.setVisible(false);
+
+		JLabel lblNewLabel_6 = new JLabel("Order Completed Successfully");
+		lblNewLabel_6.setBounds(720, 137, 185, 14);
+		lblNewLabel_6.setForeground(new Color(0, 128, 64));
+		lblNewLabel_6.setVisible(false);
+
+		table = new JTable();
+		table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		table.setColumnSelectionAllowed(true);
+		table.setCellSelectionEnabled(true);
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				TableModel tm = table.getModel();
+				int row1 = table.getSelectedRow();
+				Order_id1.setText(tm.getValueAt(row1, 6).toString());
+			}
+		});
+		scrollPane_1.setViewportView(table);
+		table.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "New column" }));
+		table.getColumnModel().getColumn(0).setPreferredWidth(85);
+		table.getColumnModel().getColumn(0).setMinWidth(20);
+		table.setBackground(new Color(172, 253, 226));
+
+		JLabel lblNewLabel_3 = new JLabel("Quantity Changed Successfully");
+		lblNewLabel_3.setBounds(567, 137, 202, 14);
+		lblNewLabel_3.setForeground(new Color(0, 128, 64));
+		lblNewLabel_3.setVisible(false);
+
+		JButton btnNewButton_2 = new JButton("Change Quantity");
+		btnNewButton_2.setBounds(567, 103, 127, 23);
+
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s1 = Order_id1.getText();
+				if (!s1.isEmpty()) {
+					lblNewLabel_5.setVisible(false);
+					lblNewLabel_6.setVisible(false);
+					try {
+						String change_quantity = JOptionPane.showInputDialog(btnNewButton_2,
+								"Enter a number of quantity", "change quantity", JOptionPane.PLAIN_MESSAGE);
+						try {
+							i = Integer.parseInt(change_quantity);
+
+						} catch (Exception e1) {
+							lblNewLabel_4.setVisible(true);
+							lblNewLabel_3.setVisible(false);
+							lblNewLabel_6.setVisible(false);
+							lblNewLabel_5.setVisible(false);
+						}
+						if (change_quantity == null) {
+							lblNewLabel_4.setVisible(true);
+							lblNewLabel_6.setVisible(false);
+							lblNewLabel_5.setVisible(false);
+						}
+
+						else if (!Character.isDigit(i)) {
+							String orderid = Order_id1.getText();
+							String qury2 = "update ordertracking set QUANTITY=" + change_quantity + " where ORDER_ID='"
+									+ orderid + "'";
+							PreparedStatement pst = con1.prepareStatement(qury2);
+							pst.executeUpdate();
+							lblNewLabel_3.setVisible(true);
+							lblNewLabel_4.setVisible(false);
+							lblNewLabel_6.setVisible(false);
+							lblNewLabel_5.setVisible(false);
+							tabledata();
+							Order_id1.setText("");
+						}
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+
+				} else {
+					if (s1.isEmpty()) {
+						lblNewLabel_5.setVisible(true);
+					}
+					lblNewLabel_6.setVisible(false);
+				}
+			}
+		});
+
+		JButton btnNewButton_2_1 = new JButton("Order Complete");
+		btnNewButton_2_1.setBounds(726, 103, 141, 23);
+		btnNewButton_2_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String del = Order_id1.getText();
+				if (!del.isEmpty()) {
+					try {
+						String qry = "delete from ordertracking where ORDER_ID='" + del + "'";
+						PreparedStatement pst = con1.prepareStatement(qry);
+						pst.executeUpdate();
+						lblNewLabel_6.setVisible(true);
+						lblNewLabel_3.setVisible(false);
+						lblNewLabel_4.setVisible(false);
+						lblNewLabel_5.setVisible(false);
+
+						tabledata();
+						Order_id1.setText("");
+						// lblNewLabel_5.setVisible(false);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else
+					lblNewLabel_3.setVisible(false);
+				if (s1.isEmpty()) {
+					lblNewLabel_5.setVisible(true);
+				}
+
+			}
+		});
+		JPanel header = new JPanel();
+		header.setBounds(1, 1, 1034, 73);
+		header.setLayout(null);
+		header.setBackground(Color.WHITE);
+
+		JLabel lblNewLabel = new JLabel("HOME");
+		lblNewLabel.setBounds(17, 55, 46, 14);
+		header.add(lblNewLabel);
+
+		JButton btnNewButton_1 = new JButton("");
+		btnNewButton_1.setBackground(new Color(157, 206, 206));
+		btnNewButton_1.setBounds(0, 0, 74, 51);
+		header.add(btnNewButton_1);
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Home h = new Home();
+				h.setVisible(true);
+				dispose();
+			}
+		});
+		btnNewButton_1.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\home2.gif"));
+		btnNewButton_1.setFont(new Font("Times New Roman", Font.BOLD, 12));
+
+		JLabel lblNewLabel_2 = new JLabel("VIEW ORDER DETAILS");
+		lblNewLabel_2.setForeground(new Color(64, 0, 0));
+		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNewLabel_2.setBounds(394, 24, 318, 27);
+		header.add(lblNewLabel_2);
+
+		JLabel logo = new JLabel("");
+		logo.setIcon(new ImageIcon("C:\\Users\\Admin\\Downloads\\logo (1).png"));
+		logo.setHorizontalAlignment(SwingConstants.CENTER);
+		logo.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		logo.setBounds(73, 0, 240, 80);
+		header.add(logo);
+
+		time1 = new JLabel("17-05-2023  16:02:46");
+		time1.setForeground(new Color(128, 0, 0));
+		time1.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		time1.setBounds(889, 52, 145, 21);
+		header.add(time1);
+		time1.setText(s1);
+
+		JButton btnNewButton_1_1_1 = new JButton("Logout");
+		btnNewButton_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int a = JOptionPane.showConfirmDialog(btnNewButton_1_1_1, "Are you Logout", "Logout",
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (a == 0) {
+					try {
+						UserLogin l = new UserLogin();
+						l.frmTrackingSystem.setVisible(true);
+						dispose();
+					} catch (Exception e1) {
+						// TODO Auto-generated
+						e1.printStackTrace();
+					}
+
+				}
+			}
+		});
+		btnNewButton_1_1_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 13));
+		btnNewButton_1_1_1.setBounds(943, 11, 81, 23);
+		header.add(btnNewButton_1_1_1);
+		contentPane.setLayout(null);
+		contentPane.add(details_panel);
+		contentPane.add(scrollPane_1);
+		contentPane.add(lblNewLabel_4);
+		contentPane.add(lblNewLabel_1_8_2);
+		contentPane.add(Order_id1);
+		contentPane.add(lblNewLabel_5);
+		contentPane.add(lblNewLabel_6);
+		contentPane.add(lblNewLabel_3);
+		contentPane.add(btnNewButton_2);
+		contentPane.add(btnNewButton_2_1);
+		contentPane.add(header);
+
+		JButton btnNewButton = new JButton("Delete");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String del = Order_id1.getText();
+				if (!del.isEmpty()) {
+					try {
+						String qry = "delete from ordertracking where ORDER_ID='" + del + "'";
+						PreparedStatement pst = con1.prepareStatement(qry);
+						pst.executeUpdate();
+//							lblNewLabel_6.setVisible(true);
+//							lblNewLabel_3.setVisible(false);
+//							lblNewLabel_4.setVisible(false);
+//							lblNewLabel_5.setVisible(false);
+
+						tabledata();
+						Order_id1.setText("");
+						JOptionPane.showMessageDialog(btnNewButton, "Order deleted");
+						lblNewLabel_5.setVisible(false);
+						// lblNewLabel_5.setVisible(false);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else
+					// lblNewLabel_3.setVisible(false);
+					// if(s1.isEmpty()) {
+					lblNewLabel_5.setVisible(true);
+				// }
+
+			}
+		});
+		btnNewButton.setBounds(894, 103, 89, 23);
+		contentPane.add(btnNewButton);
+	}
+
+	public void tabledata() {
+		String qry = "SELECT PRODUCT_NAME,QUANTITY,RECIPE_ID,RECIPE_NAME,AREA,ROOM_NO,ORDER_ID,DATEANDTIME FROM ordertracking ORDER BY ORDER_ID DESC";
+		Statement stm;
+		try {
+			stm = con1.createStatement();
+			ResultSet rst = stm.executeQuery(qry);
+			table.setModel(DbUtils.resultSetToTableModel(rst));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public void run() {
+
+		while (true) {
+			Date d1 = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss aa");
+			String s1 = sdf.format(d1);
+			time1.setText(s1);
+
+		}
+
+	}
+}

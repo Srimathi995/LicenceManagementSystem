@@ -1,0 +1,306 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.ComponentOrientation;
+import javax.swing.border.CompoundBorder;
+import javax.swing.UIManager;
+import java.awt.SystemColor;
+import javax.swing.JTextField;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import javax.swing.JPasswordField;
+import javax.swing.JCheckBox;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JToggleButton;
+import javax.swing.Timer;
+import javax.swing.JLabel;
+
+
+
+public class UserLogin extends JFrame {
+	private JPanel contentPane;
+	JFrame frmTrackingSystem;
+	JFrame frame1;
+	private JPanel panel_User;
+	private JPanel panel_Pass;
+	private static JTextField txt_user;
+	private JLabel lblPassword;
+	private JLabel lblOrderTrackingSystem;
+	private JLabel lblNewLabel_2;
+	private JLabel lbl_Username;
+	private JButton btnClear;
+	private JPasswordField txt_pass;
+	private JButton btnRegister;
+	JLabel show_username;
+	String b;
+	int a = 0;
+	int timeout = 0;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UserLogin frame = new UserLogin();
+					frame.frmTrackingSystem.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public UserLogin() throws Exception {
+		fn_Intial();
+		fn_Con_Sql();
+	}
+
+	Connection con;
+	private JLabel car;
+
+	public void fn_Con_Sql() throws Exception {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-4CLCMNC:1433;DATABASENAME=jdbc", "sa",
+				"shivsp9987");
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public void fn_Intial() {
+		frmTrackingSystem = new JFrame();
+		frmTrackingSystem.setTitle("tracking system");
+		frmTrackingSystem.setBackground(new Color(64, 128, 128));
+
+		frmTrackingSystem.setBounds(100, 100, 1050, 600);
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		frmTrackingSystem.setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		panel_User = new JPanel();
+		panel_User.setBounds(567, 242, 85, 20);
+		contentPane.add(panel_User);
+		panel_User.setLayout(null);
+
+		lbl_Username = new JLabel("Username");
+		lbl_Username.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lbl_Username.setBackground(SystemColor.menu);
+		lbl_Username.setBounds(10, 1, 79, 17);
+		panel_User.add(lbl_Username);
+
+		panel_Pass = new JPanel();
+		panel_Pass.setBounds(567, 299, 85, 20);
+		contentPane.add(panel_Pass);
+		panel_Pass.setLayout(null);
+
+		lblPassword = new JLabel("Password");
+		lblPassword.setBounds(13, 0, 62, 17);
+		lblPassword.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblPassword.setBackground(SystemColor.menu);
+		panel_Pass.add(lblPassword);
+
+		txt_user = new JTextField();
+		txt_user.setBounds(724, 243, 201, 20);
+		contentPane.add(txt_user);
+		txt_user.setColumns(10);
+
+		lblOrderTrackingSystem = new JLabel("RECIPE MANAGEMENT SYSTEM");
+		lblOrderTrackingSystem.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblOrderTrackingSystem.setBackground(SystemColor.menu);
+		lblOrderTrackingSystem.setBounds(360, 11, 419, 71);
+		 Timer timer;
+		 timer = new Timer(500, new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	            	 Font currentFont = lblOrderTrackingSystem.getFont();
+	                 int style = rootPaneCheckingEnabled ? Font.PLAIN : Font.BOLD;
+	                 lblOrderTrackingSystem.setFont(currentFont.deriveFont(style));
+	                 rootPaneCheckingEnabled = !rootPaneCheckingEnabled;
+	            }
+	        });
+
+	        // Start the timer to initiate blinking
+	        timer.start();
+		contentPane.add(lblOrderTrackingSystem);
+		Color color = Color.blue;
+
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setForeground(new Color(0, 0, 0));
+		btnSubmit.setBackground(new Color(128, 128, 192));
+		btnSubmit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (timeout < 3) {
+					String user = txt_user.getText();
+					String pass = txt_pass.getText();
+					ImageIcon ic = new ImageIcon("images/thumb.png");
+					if (!user.isEmpty() && !pass.isEmpty()) {
+						String qry = "select * from register where PASSWORD='" + pass + "'  and    user_name='" + user
+								+ "'   ";
+						try {
+							Statement stm = con.createStatement();
+							ResultSet rst = stm.executeQuery(qry);
+							if (rst.next()) {
+								Home h = new Home();
+								h.setVisible(true);
+								frmTrackingSystem.dispose();
+							} else {
+								JOptionPane.showMessageDialog(btnSubmit, "Invalid UserName and Password ");
+								timeout++;
+							}
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+					if (!user.isEmpty() && pass.isEmpty()) {
+						JOptionPane.showMessageDialog(btnSubmit, "Please enter your password");
+					} else if (user.isEmpty() && !pass.isEmpty()) {
+						JOptionPane.showMessageDialog(btnSubmit, "Please enter your username");
+					} else if (user.isEmpty() && pass.isEmpty()) {
+						JOptionPane.showMessageDialog(btnSubmit, "Please enter username and password ");
+					}
+				} else {
+					JOptionPane.showMessageDialog(btnSubmit, "Give Forget password or Close and Open try", "Warning",
+							JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		});
+		btnSubmit.setBounds(724, 366, 89, 23);
+		contentPane.add(btnSubmit);
+
+		btnClear = new JButton("Clear");
+		btnClear.setBackground(new Color(128, 128, 192));
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txt_pass.setText("");
+				txt_user.setText("");
+			}
+		});
+		btnClear.setBounds(846, 366, 79, 23);
+		contentPane.add(btnClear);
+
+		btnRegister = new JButton("Sign up");
+		btnRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SignupRegister r = null;
+				try {
+					r = new SignupRegister();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				r.setVisible(true);
+				frmTrackingSystem.dispose();
+			}
+		});
+		btnRegister.setForeground(Color.BLACK);
+		btnRegister.setBackground(new Color(128, 128, 192));
+		btnRegister.setBounds(598, 366, 89, 23);
+		contentPane.add(btnRegister);
+
+		JLabel lbl_Frgt_Pwd = new JLabel();
+		lbl_Frgt_Pwd.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Color c = color.blue;
+				lbl_Frgt_Pwd.setForeground(c);
+				Forgetpass fp = null;
+				try {
+					fp = new Forgetpass();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				fp.setVisible(true);
+
+			}
+		});
+		lbl_Frgt_Pwd.setBounds(734, 326, 163, 14);
+		contentPane.add(lbl_Frgt_Pwd);
+		String s1 = "<html><u>Forget password</u></html>";
+		lbl_Frgt_Pwd.setText(s1);
+		lbl_Frgt_Pwd.setVisible(true);
+
+		JPanel panel_3 = new JPanel();
+		panel_3.setBackground(Color.WHITE);
+		panel_3.setBounds(505, 181, 519, 265);
+		contentPane.add(panel_3);
+		panel_3.setLayout(null);
+
+		JLabel lblNewLabel_3 = new JLabel("New label");
+		lblNewLabel_3.addMouseListener(new MouseAdapter() {
+			@Override
+
+			public void mouseClicked(MouseEvent e) {
+
+				if (a == 1) {
+					txt_pass.setEchoChar((char) 0);
+				} else if (a == 2) {
+					txt_pass.setEchoChar('•');
+					a = 0;
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				a++;
+
+			}
+		});
+		lblNewLabel_3.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\eye3.png"));
+		lblNewLabel_3.setBounds(402, 114, 19, 17);
+		panel_3.add(lblNewLabel_3);
+
+		lblNewLabel_2 = new JLabel("LOGIN HERE");
+		lblNewLabel_2.setBounds(145, 11, 174, 17);
+		panel_3.add(lblNewLabel_2);
+		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD, 22));
+
+		txt_pass = new JPasswordField();
+		txt_pass.setBounds(219, 114, 186, 20);
+		panel_3.add(txt_pass);
+
+		JPanel panel_2_1 = new JPanel();
+		panel_2_1.setLayout(null);
+		panel_2_1.setBounds(402, 114, 19, 20);
+		panel_3.add(panel_2_1);
+
+		JLabel lbl_Login_img = new JLabel("");
+		lbl_Login_img.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\Login3.jpg"));
+		lbl_Login_img.setBounds(80, 181, 426, 265);
+		contentPane.add(lbl_Login_img);
+
+	}
+	public static String getUserName() {
+        String user = txt_user.getText(); 
+        return user;
+    }
+
+}

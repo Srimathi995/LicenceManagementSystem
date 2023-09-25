@@ -1,0 +1,218 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.AbstractDocument.Content;
+import javax.swing.JTree;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.Label;
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.awt.event.ActionEvent;
+
+public class Home extends JFrame implements Runnable {
+	private JPanel contentPane;
+	JLabel time1;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+
+					Home frame = new Home();
+					frame.setVisible(true);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public Home() {
+		Home1();
+		Thread t = new Thread(this);
+		t.start();
+		// run();
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public void Home1() {
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1050, 600);
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JButton btnNewButton = new JButton("Place Order");
+		btnNewButton.setBackground(new Color(240, 240, 240));
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Orderentry or = null;
+				try {
+					try {
+						or = new Orderentry();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				or.setVisible(true);
+				dispose();
+			}
+		});
+		btnNewButton.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnNewButton.setBounds(404, 368, 188, 25);
+		contentPane.add(btnNewButton);
+
+		JButton btnViewOrderDetails = new JButton("Order Details");
+		btnViewOrderDetails.setBackground(new Color(240, 240, 240));
+		btnViewOrderDetails.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Vieworder vo = null;
+				try {
+					vo = new Vieworder();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				vo.setVisible(true);
+				dispose();
+			}
+		});
+		btnViewOrderDetails.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnViewOrderDetails.setBounds(404, 414, 188, 23);
+		contentPane.add(btnViewOrderDetails);
+		ImageIcon im = new ImageIcon(this.getClass().getResource("/image1.jpg"));
+
+		JPanel header = new JPanel();
+		header.setLayout(null);
+		header.setBackground(Color.WHITE);
+		header.setBounds(0, 0, 1034, 73);
+		contentPane.add(header);
+
+		JLabel lblNewLabel_2 = new JLabel("ORDER TRACKING SYSTEM");
+		lblNewLabel_2.setForeground(new Color(64, 0, 0));
+		lblNewLabel_2.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNewLabel_2.setBounds(394, 24, 347, 27);
+		header.add(lblNewLabel_2);
+
+		JLabel logo = new JLabel("");
+		logo.setIcon(new ImageIcon("C:\\Users\\Admin\\Downloads\\logo (1).png"));
+		logo.setHorizontalAlignment(SwingConstants.CENTER);
+		logo.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		logo.setBounds(72, 0, 246, 80);
+		header.add(logo);
+
+		time1 = new JLabel("18-05-2023 11:23:16 am");
+		time1.setForeground(new Color(128, 0, 0));
+		time1.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		time1.setBounds(889, 52, 145, 21);
+		header.add(time1);
+		JButton btnNewButton_1 = new JButton("Logout");
+		btnNewButton_1.setBounds(943, 24, 81, 23);
+		header.add(btnNewButton_1);
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int r = JOptionPane.showConfirmDialog(btnNewButton_1, "Are you logout", "logout",
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (r == JOptionPane.YES_OPTION) {
+					try {
+						UserLogin l2 = new UserLogin();
+						l2.frmTrackingSystem.setVisible(true);
+						dispose();
+
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		btnNewButton_1.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 13));
+
+		JLabel show_username = new JLabel(UserLogin.getUserName());
+		show_username.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		show_username.setBounds(943, 11, 62, 14);
+		header.add(show_username);
+
+		JButton btnNewButton_2 = new JButton("Recipe Details");
+		btnNewButton_2.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					RecipeDetails v = new RecipeDetails();
+					v.setVisible(true);
+					dispose();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnNewButton_2.setBounds(404, 317, 188, 23);
+		contentPane.add(btnNewButton_2);
+
+		JButton btnNewButton_3 = new JButton("Order Status");
+		btnNewButton_3.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AdminAccessPrivilages of1;
+				try {
+					of1 = new AdminAccessPrivilages();
+					of1.setVisible(true);
+					dispose();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnNewButton_3.setBounds(404, 269, 188, 23);
+		contentPane.add(btnNewButton_3);
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			Date d1 = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss aa");
+			String s1 = sdf.format(d1);
+			time1.setText(s1);
+
+		}
+	}
+}

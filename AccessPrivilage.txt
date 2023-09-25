@@ -1,0 +1,556 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import net.proteanit.sql.DbUtils;
+
+import java.awt.Color;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
+import javax.swing.JScrollPane;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import java.awt.event.ActionEvent;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import java.awt.event.MouseMotionAdapter;
+import javax.swing.SwingConstants;
+import javax.swing.ImageIcon;
+import javax.swing.JTextPane;
+
+public class AdminAccessPrivilages extends JFrame implements Runnable {
+	int seconds;
+	private JPanel contentPane;
+	private JTable table;
+	String stime;
+	int if1 = 0;
+	int if2 = 0;
+	Timer tm;
+	Timer tm3;
+	int sec;
+	int blink;
+	int h;
+	int min;
+	int sec2;
+	int donen;
+	int taskc;
+	int t;
+	JComboBox tasktimesel;
+	String starttimewithday;
+	String stoptimewithday;
+	long dif;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AdminAccessPrivilages frame = new AdminAccessPrivilages();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public AdminAccessPrivilages() throws Exception {
+		Officework1();
+		sql1();
+		Thread t1 = new Thread(this);
+		t1.start();
+		time2();
+		// blink();
+		tableget();
+		time3();
+
+	}
+
+	Connection con;
+	private JScrollPane scrollPane_1;
+	private JLabel lblNewLabel_1;
+	private JTextField txt_name;
+	private JTextField txt_roles;
+	int i = 0;
+	String s1;
+	private JLabel time;
+	private JTextField txt_start_time;
+	private JTextField txtTaskNotCompleted;
+	private JTextField txt_stop;
+	private JTable table_1;
+	private JScrollPane scrollPane;
+	private JButton btnNewButton_2;
+	private JLabel lblNewLabel_3;
+	private JButton btnNewButton_3;
+	private JTextField tasktime;
+	private JTable table_2;
+
+	public void sql1() throws Exception {
+		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		con = DriverManager.getConnection("jdbc:sqlserver://DESKTOP-4CLCMNC:1433;DATABASENAME=jdbc", "sa",
+				"shivsp9987");
+	}
+
+	/**
+	 * Create the frame.
+	 * 
+	 * @throws InterruptedException
+	 */
+	public void Officework1() throws InterruptedException {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1185, 600);
+		contentPane = new JPanel();
+		contentPane.setBackground(Color.WHITE);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		JLabel lblNewLabel = new JLabel("Select Status :");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel.setBounds(4, 55, 107, 31);
+		contentPane.add(lblNewLabel);
+
+		lblNewLabel_1 = new JLabel("Name :");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel_1.setBounds(4, 119, 46, 14);
+		contentPane.add(lblNewLabel_1);
+
+		txt_name = new JTextField();
+		txt_name.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				txt_name.setToolTipText("please select task");
+			}
+		});
+		txt_name.setEditable(false);
+		txt_name.setBounds(126, 116, 134, 22);
+		contentPane.add(txt_name);
+		txt_name.setColumns(10);
+
+		JLabel lblNewLabel_2 = new JLabel("Roles :");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel_2.setBounds(7, 174, 46, 14);
+		contentPane.add(lblNewLabel_2);
+
+		txt_roles = new JTextField();
+		txt_roles.setEditable(false);
+		txt_roles.setBounds(125, 172, 141, 20);
+		contentPane.add(txt_roles);
+		txt_roles.setColumns(10);
+
+		JComboBox comboBox = new JComboBox();
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				String task = comboBox.getSelectedItem().toString();
+				String qry = "select User_name,roles from quickdetails where task='" + task + "'";
+				try {
+					Statement stm = con.createStatement();
+					ResultSet rst = stm.executeQuery(qry);
+					table.setModel(DbUtils.resultSetToTableModel(rst));
+					scrollPane_1.setVisible(true);
+					// con.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		comboBox.setModel(new DefaultComboBoxModel(new String[] { "--Select--", "Consumed", "Released", "Cancelled",
+				"Booked", "Started", "InProcessed" }));
+		comboBox.setBounds(127, 61, 125, 22);
+		contentPane.add(comboBox);
+
+		tasktimesel = new JComboBox();
+		tasktimesel.setModel(new DefaultComboBoxModel(new String[] { "Sec", "Min" }));
+		tasktimesel.setBounds(165, 221, 61, 20);
+		contentPane.add(tasktimesel);
+
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(288, 56, 134, 37);
+		contentPane.add(scrollPane_1);
+		scrollPane_1.setVisible(false);
+
+		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				TableModel tm = table.getModel();
+				int row = table.getSelectedRow();
+				// int col=table.getSelectedColumn();
+
+				txt_name.setText(tm.getValueAt(row, 0).toString());
+				txt_roles.setText(tm.getValueAt(row, 1).toString());
+
+			}
+		});
+		scrollPane_1.setViewportView(table);
+		table.setModel(new DefaultTableModel(new Object[][] {}, new String[] {}));
+		table.setCellSelectionEnabled(true);
+		table.setColumnSelectionAllowed(true);
+		table.setSurrendersFocusOnKeystroke(true);
+
+		JButton btnNewButton = new JButton("Assign Order");
+		btnNewButton.setBackground(new Color(255, 255, 255));
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (if1 == 0) {
+					if (!txt_name.getText().isEmpty()) {
+						txt_start_time.setText(time.getText().substring(11, 22));
+						starttimewithday = time.getText().substring(0, 19);
+						// System.out.println(txt_start_time);
+						txt_start_time.setVisible(true);
+						btnNewButton.setBackground(new Color(10, 230, 10));
+						if1++;
+						tm.start();
+						tm3.start();
+						if2 = 0;
+						taskc++;
+						tasktime.setEditable(false);
+						comboBox.setEnabled(false);
+						String test1 = tasktimesel.getSelectedItem().toString();
+						String test2 = "Sec";
+						if (test1.equals(test2)) {
+							String s1 = tasktime.getText().toString();
+							t = Integer.parseInt(s1);
+
+						} else {
+							String s2 = tasktime.getText().toString();
+							int t1 = Integer.parseInt(s2);
+							t = t1 * 60;
+							// System.out.println(t);
+						}
+
+					} else {
+						JOptionPane.showMessageDialog(btnNewButton, "please give name");
+					}
+				}
+			}
+		});
+		btnNewButton.setBounds(103, 299, 118, 23);
+		contentPane.add(btnNewButton);
+
+		JButton btnNewButton_1 = new JButton("Completed Order");
+		btnNewButton_1.setBackground(new Color(255, 255, 255));
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (taskc == 1) {
+					txt_stop.setText(time.getText().substring(11, 22));
+					stoptimewithday = time.getText().substring(0, 19);
+					txt_stop.setVisible(true);
+					donen++;
+					btnNewButton.setBackground(new Color(255, 255, 255));
+					tm.stop();
+					tm3.stop();
+					if1 = 0;
+					sec = 0;
+					txtTaskNotCompleted.setVisible(false);
+
+					if2++;
+					taskc = 0;
+					tasktime.setEditable(true);
+
+					comboBox.setEnabled(true);
+				} else {
+					JOptionPane.showMessageDialog(btnNewButton_1, "assign recipe");
+				}
+			}
+		});
+		btnNewButton_1.setBounds(718, 299, 157, 23);
+		contentPane.add(btnNewButton_1);
+
+		txt_start_time = new JTextField();
+		txt_start_time.setBounds(347, 221, 86, 20);
+		contentPane.add(txt_start_time);
+		txt_start_time.setColumns(10);
+		txt_start_time.setVisible(false);
+
+		txtTaskNotCompleted = new JTextField();
+		txtTaskNotCompleted.setEditable(false);
+		txtTaskNotCompleted.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		txtTaskNotCompleted.setText("Running Order");
+		txtTaskNotCompleted.setBounds(957, 300, 118, 22);
+		contentPane.add(txtTaskNotCompleted);
+		txtTaskNotCompleted.setVisible(false);
+		txtTaskNotCompleted.setColumns(10);
+
+		txt_stop = new JTextField();
+		txt_stop.setBounds(459, 221, 86, 20);
+		contentPane.add(txt_stop);
+		txt_stop.setColumns(10);
+		txt_stop.setVisible(false);
+
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(90, 370, 1149, 168);
+		contentPane.add(scrollPane);
+
+		table_1 = new JTable();
+		table_1.setEnabled(false);
+		table_1.setBackground(new Color(232, 209, 121));
+		scrollPane.setViewportView(table_1);
+
+		lblNewLabel_3 = new JLabel("ORDER DETAILS");
+		lblNewLabel_3.setEnabled(false);
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_3.setBounds(10, 333, 195, 49);
+		contentPane.add(lblNewLabel_3);
+
+		btnNewButton_3 = new JButton("Done");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (donen == 1) {
+					String task = comboBox.getSelectedItem().toString();
+					String name1 = txt_name.getText();
+					String roles1 = txt_roles.getText();
+					String start1 = txt_start_time.getText().substring(0, 8);
+					String stop1 = txt_stop.getText().substring(0, 8);
+					String withd = txt_start_time.getText();
+					String withde = txt_stop.getText();
+					SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+					Date d1 = null;
+					Date d2 = null;
+					try {
+						d1 = sdf.parse(start1);
+						d2 = sdf.parse(stop1);
+
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
+					dif = d2.getTime() - d1.getTime();
+
+					long difsec = dif / 1000 % 60;
+					long difmin = dif / (60 * 1000) % 60;
+					long difhour = dif / (60 * 60 * 1000) % 24;
+
+					String r = null;
+					r = (difhour + ":" + difmin + ":" + difsec);
+					String qry1 = "insert into AccessPrivilage values('" + name1 + "','" + roles1 + "','" + task + "','"
+							+ starttimewithday + "','" + stoptimewithday + "','" + r + "')";
+
+					try {
+						PreparedStatement pst = con.prepareStatement(qry1);
+						pst.executeUpdate();
+
+						txt_start_time.setVisible(false);
+						txt_stop.setVisible(false);
+
+						comboBox.setSelectedIndex(0);
+						txt_name.setText("");
+						txt_roles.setText("");
+						tableget();
+						tm3.stop();
+						sec2 = 0;
+
+						donen = 0;
+						starttimewithday = null;
+						stoptimewithday = null;
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} else {
+					JOptionPane.showMessageDialog(btnNewButton_1, "before done please assign task");
+				}
+			}
+		});
+		btnNewButton_3.setBounds(324, 299, 89, 23);
+		contentPane.add(btnNewButton_3);
+
+		JLabel lblNewLabel_4 = new JLabel("Set task time :");
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblNewLabel_4.setBounds(8, 221, 105, 14);
+		contentPane.add(lblNewLabel_4);
+
+		tasktime = new JTextField();
+		tasktime.setText("10");
+		tasktime.setBounds(126, 221, 39, 20);
+		contentPane.add(tasktime);
+		tasktime.setColumns(10);
+
+		JPanel header = new JPanel();
+		header.setLayout(null);
+		header.setBackground(Color.WHITE);
+		header.setBounds(0, 0, 1179, 49);
+		contentPane.add(header);
+
+		JLabel lblNewLabel_5 = new JLabel("HOME");
+		lblNewLabel_5.setBounds(17, 55, 46, 14);
+		header.add(lblNewLabel_5);
+
+		JLabel lblNewLabel_2_1 = new JLabel("ORDER STATUS");
+		lblNewLabel_2_1.setForeground(new Color(64, 0, 0));
+		lblNewLabel_2_1.setFont(new Font("Times New Roman", Font.BOLD, 25));
+		lblNewLabel_2_1.setBounds(394, 24, 363, 27);
+		header.add(lblNewLabel_2_1);
+
+		JLabel logo = new JLabel("");
+		logo.setIcon(new ImageIcon("C:\\Users\\Admin\\Downloads\\logo (1).png"));
+		logo.setHorizontalAlignment(SwingConstants.CENTER);
+		logo.setFont(new Font("Times New Roman", Font.BOLD, 20));
+		logo.setBounds(87, -20, 240, 80);
+		header.add(logo);
+
+		JLabel time1 = new JLabel("09-06-2023 02:54:40 pm");
+		time1.setForeground(new Color(128, 0, 0));
+		time1.setFont(new Font("Times New Roman", Font.BOLD, 12));
+		time1.setBounds(889, 52, 145, 21);
+		header.add(time1);
+
+		btnNewButton_2 = new JButton("");
+		btnNewButton_2.setIcon(new ImageIcon("C:\\Users\\HP\\Downloads\\home2.gif"));
+		btnNewButton_2.setBounds(0, 0, 101, 44);
+		header.add(btnNewButton_2);
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Home l1 = null;
+				try {
+					l1 = new Home();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				l1.setVisible(true);
+				dispose();
+			}
+		});
+		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 15));
+
+		time = new JLabel("New label");
+		time.setBounds(1022, 34, 147, 14);
+		header.add(time);
+
+		JButton btnNewButton_4 = new JButton("Order Details");
+		btnNewButton_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Taskdetails td = new Taskdetails();
+					td.setVisible(true);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		btnNewButton_4.setBounds(516, 299, 118, 23);
+		contentPane.add(btnNewButton_4);
+
+		table_2 = new JTable();
+		table_2.setBounds(4, 242, 1119, 94);
+		contentPane.add(table_2);
+
+		// System.out.println(dif);
+
+	}
+
+	@Override
+	public void run() {
+
+		while (true) {
+			Date d1 = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss aa");
+			stime = sdf.format(d1).toString();
+			time.setText(stime);
+			if (if1 == 1) {
+				if (sec > t) {
+					txtTaskNotCompleted.setVisible(true);
+					txtTaskNotCompleted.setBackground(new Color(230, 0, 30));
+
+					txtTaskNotCompleted.setBackground(new Color(250, 250, 250));
+				}
+
+			}
+
+		}
+	}
+
+	public void time2() {
+		tm = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// System.out.print(sec);
+				sec++;
+			}
+		});
+	}
+
+	public void time3() {
+		tm3 = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// System.out.print(sec);
+				sec2++;
+			}
+		});
+	}
+
+//	public void blink() {
+//		if(if1==1 ) {
+//			while(true) {
+//			if(sec%2==0 ) {
+////				while(true) {
+////				blink++;
+////				if(blink==1) {
+//					
+//					
+//			
+//				txtTaskNotCompleted.setBackground( new Color(250,250,250));
+////				try {
+////					Thread.sleep(000);
+////				} catch (InterruptedException e) {
+////					// TODO Auto-generated catch block
+////					e.printStackTrace();
+////				}
+//				}
+//			else {
+//				txtTaskNotCompleted.setBackground( new Color(230, 0, 30));
+//		}
+//			}
+//			}
+
+	public void tableget() throws SQLException {
+		String qry = "  select User_name ,roles,task,task_assign,task_close, CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/(60*60*1000)%24 AS varchar(50)) +' Hr '+ "
+				+ " CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/(60*1000)%60 AS varchar(50))   + ' Mins '+ "
+				+ " CAST(DATEDIFF(MILLISECOND,task_assign,task_close)/1000 %60 AS varchar(50))       + ' Secs ' AS Duration "
+				+ "  FROM AccessPrivilage";
+		Statement stm = con.createStatement();
+		ResultSet rst = stm.executeQuery(qry);
+		table_1.setModel(DbUtils.resultSetToTableModel(rst));
+
+	}
+}
+
+//	public class blink extends Thread{
+//		public void run() {
+//			
+//		}
+//	}
+//	
