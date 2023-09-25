@@ -1,2 +1,1 @@
-# LicenceManagementSystem
-CRUD operation using collection
+Java and Oracle used software
